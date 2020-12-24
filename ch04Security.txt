@@ -1,0 +1,58 @@
+Add the 'spring-boot-starter-security' to the project, and by default, ALL
+request paths require authentication - the logs will give you a generated password
+and the username will be 'user' (HTTP Basic Authentication).
+
+This is obviously pretty rudimentary.  For this app, the following security requirements
+would be a good start:
+- Prompt for authentication from a login page, rather than an HTTP basic dialog box
+- Provide for multiple users, and enable a registration page so new customers can sign up
+- Apply different security rules for different pages.  The homepage and registration pages
+shouldn't require authentication at all.
+
+Doing this requires overwriting the default autoconfiguration given to you out of the box
+by the spring security starter package.
+
+CONFIGURING SPRING SECURITY
+---------------------------------
+Note that Java configuration is much simpler, and less lengthy than the old-style XML
+configuration.
+
+When manually testing security, it's useful to set your browser to use incognito/private mode, which
+ensures that you get a fresh session each time you open a new window - ie. there won't be any
+remnants of the previous session preventing you testing any changes you've just made in terms of
+security.
+
+The first main task is to configure a user store that can handle more than one user.  Spring Security
+offers several solutions for this:
+- An in-memory user store
+- A JDBC-backed user store
+- An LDAP-backed user store
+- A custom user details service
+
+No matter which user store you choose, you can configure it by overriding a 'configure()' method
+defined in the 'WebSecurityConfigurerAdapter' configuration base class.
+
+IN-MEMORY USER STORE
+-------------------------
+Suppose you have only a handful of users, and they are unlikely to change - why not keep things
+simple and define those users as part of the security configuration?
+
+The in-memory user store is convenient for testing, but when it comes to editing users it isn't so
+easy - in order to add, edit or delete a user, you'll have to make th necessary changes to the code,
+then rebuild and redeploy the app.  For Taco Cloud, you want users to be able to register with the
+application and manage their own accounts, which isn't allowed by the in-memory user store approach.
+
+JDBC-BASED USER STORE
+--------------------------
+...
+
+WORKING WITH ENCODED PASSWORDS
+--------------------------------
+User passwords are expected to be stored in the database.  However, if they're stored in plain text,
+they can be seen by a hacker.  On the other hand, if they're encoded in the database, then the encoded
+value will not match the plain text value supplied by the user.  The solution is to specify a password
+encoder by calling the 'passwordEncoder()' method.
+
+Whichever password encoder you use, the password in the database is never decoded.  Instead, the password
+that the user enters at login is encoded using the sae algorithm, and it is then compared with the encoded
+password in the database.

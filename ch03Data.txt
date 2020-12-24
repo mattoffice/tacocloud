@@ -1,0 +1,69 @@
+SQLException is a CHECKED exception: it requires handling in a catch block - the code won't compile
+otherwise.
+CHECKED exceptions are checked at COMPILE TIME, whereas UNCHECKED exceptions are checked
+at runtime.
+A checked exception needs to either be handled in a try-catch block, or it should
+be declared in the method definition using the 'throws' keyword.
+
+The most common SQL exceptions, like failing to create a connection to the db, or a mistyped query,
+can't possibly be addressed in a catch block - so they're likely to be rethrown for handling further
+upstream.
+
+With JDBC however, there is no code to create a connection, or prepare a statement, and no code to
+clean up the connection - and there isn't any handling of exceptions that can't be properly handled in a
+catch block.
+
+ADAPTING DOMAIN OBJECTS FOR PERSISTENCE
+------------------------------------------
+It's a good idea for all your objects to have one field that uniquely identifies the object.
+
+Also, to capture the data and time that objects are created, add a field of type Date.
+With Lombok, there's no need to declare getter and setter methods, as these will be present
+automatically at runtime.
+
+USING JDBC TEMPLATE
+--------------------------
+JDBC TEMPLATE will be used to read and write the domain classes to a database.
+
+The first stage is to add JdbcTemplate to the project classpath: do this by adding
+Spring Boot's JDBC starter dependency to the build ('spring-boot-starter-jdbc').
+
+The H2 embedded database is perfect for development.
+
+By annotating a repository with '@Repository', you declare that it should be automatically
+discovered by Spring component scanning and instantiated as a bean in the Spring application
+context.  When Spring creates the repository bean, 'JdbcIngredientRepository' in this instance,
+it injects it with 'JdbcTemplate' inside the constructor with the '@Autowired' annotation - this instance
+of 'JdbcTemplate' will be used in the other methods of the repository to query and insert into the
+database.
+
+JdbcTemplate's 'query()' method accepts the SQL for the query, as well as an implementation of
+Spring's 'RowMapper' for the purposes of mapping each row in the result set to an object.  It may
+also take a third argument for a list of parameters that may be required by the SQL query.
+
+The 'queryForObject()' method is used when only a single row/ object is expected to be returned.
+
+The 'update()' method can be used for any operation that writes or updates to the database.
+
+With the a data repository defined, it can be injected for use in controller classes.
+
+The @SessionAttributes annotation specifies any objects that need to be present across the entire
+session, and multiple requests.
+
+The Order parameter of the processDesign method is annotated with @ModelAttribute, indicating that
+its value comes from the model, and that Spring MVC shouldn't attempt to bind any request parameters
+to it.
+
+The Order object is kept in the session and isn't saved to the database until the user completes
+and submits the order form.  At that point, OrderController will have to call out to an implementation
+of OrderRepository to save the order.
+
+SimpleJdbcInsert wraps JdbcTemplate to avoid the complexities of using a PreparedStatementCreator.  In the
+JdbcOrderRepository implementation of OrderRepository, a couple of instances of SimpleJdbcInsert are
+created in the constructor - one for inserting into the Taco_Order table, and one for inserting into the
+Taco_Order_Tacos table.
+
+SPRING DATA JPA
+----------------------
+
+
