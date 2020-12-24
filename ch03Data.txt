@@ -68,5 +68,5 @@ Taco_Order_Tacos table.
 
 SPRING DATA JPA
 ----------------------
-
+Some notes on jpa...
 
