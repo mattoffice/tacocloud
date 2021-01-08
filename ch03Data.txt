@@ -67,6 +67,33 @@ created in the constructor - one for inserting into the Taco_Order table, and on
 Taco_Order_Tacos table.
 
 SPRING DATA JPA
+--------------------
 ----------------------
-Some notes on jpa...
+The most interesting and useful feature of JPA is the ability to automatically create repositories, based
+on a repository specification interface.
+
+Including the 'spring-boot-starter-data-jpa' in the build not only brings in Spring Dat JPA, but also
+transitively includes Hibernate as the JPA implementation.
+
+ANNOTATING THE DOMAIN AS ENTITIES
+-------------------------
+To declare a domain object as a JPA entity, it needs to be annotated with '@Entity'.
+
+To designate a property as that which will uniquely identify the entity in the database, annotate
+it with @Id.
+
+JPA requires that entities have a no-args constructor, and Lombok's '@NoArgsConstructor' takes care of this.
+'@NoArgsConstructor(force=true)' forces a no-args constructor to be created, even if some fields are marked
+as final (which would normally disallow a no-args constructor).  Lombok sets all the final properties that must
+be set to 0/ false / null depending on their type.  Also, to prevent you actually using the no-args constructor,
+as this isn't necessary, it's marked with 'AccessLevel.PRIVATE'.
+
+When '@Data' is present, a required-args constructor is implicitly added.  However, when the '@NoArgsConstructor'
+is used, this is removed - so in this case, you must annotate with '@RequiredArgsConstructor' to restore it.
+
+If you're relying on the database to automatically generate an entity's id value, then the chosen identity property
+should be annotated both by '@Id' and '@GeneratedValue(strategy=GenerationType.AUTO)'.
+
+'@ManyToMany(targetEntity=<targetEntity>.class)' lets you define a many to many relationship between an entity
+and another target entity.
 
